@@ -23,6 +23,9 @@ class bomb {
     if (y < ground) {  //currently bombs just stop at ground 
       x += velx;
       y += vely;
+      if (x < 0 || x > 800) { //if bomb tries to go out of bounds it bounces back ideally some kind of targeting system may be better but idk how 
+        velx = velx * -1;
+      }
     }
   }
   
