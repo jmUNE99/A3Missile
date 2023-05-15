@@ -5,7 +5,9 @@ float trailLength;
 float trailSpacing;
 float trailX;
 float trailY;
+float ground = 600;
 
+//This section is the generation of the bombs
 class bomb {
   float x, y; // position of the enemy bomb
   float velx, vely; // velocity of the enemy bomb
@@ -48,7 +50,7 @@ class bomb {
   }
 }
 
-float ground = 600;
+
 
 bomb[] bombs = new bomb[10];
 
