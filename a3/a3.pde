@@ -8,11 +8,13 @@ float trailY;
 float ground = 600;
 
 
+
 //This section is the generation of the bombs
 class bomb {
   float x, y; // position of the enemy bomb
   float velx, vely; // velocity of the enemy bomb
   boolean exploded;
+  int explosionTime;
   
   // set bomb pos & velovcity
   bomb() {
@@ -33,6 +35,7 @@ class bomb {
       }
      if (y >= ground) {
        exploded = true;
+       explosionTime = millis();
       }
     }
   }
@@ -57,8 +60,11 @@ class bomb {
     } else {
       //explosion
       noStroke();
-      fill(255, 243, 166);
-      circle(x, y, 10);
+      int fadetime = 500;
+      int fadingtime = millis() - explosionTime;
+      int alpha = int(map(fadingtime, 0, fadetime, 255, 0));
+      fill(255, 243, 166, alpha);
+      circle(x, y, 30);
     }
   }
 }
