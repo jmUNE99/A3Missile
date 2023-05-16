@@ -35,7 +35,7 @@ class bomb {
       }
      if (y >= ground) {
        exploded = true;
-       explosionTime = millis();
+       explosionTime = millis(); // stores time for explosion this will be used for fade out 'explosion effect'
       }
     }
   }
@@ -60,9 +60,9 @@ class bomb {
     } else {
       //explosion
       noStroke();
-      int fadetime = 500;
-      int fadingtime = millis() - explosionTime;
-      int alpha = int(map(fadingtime, 0, fadetime, 255, 0));
+      int fadeTime = 500; //duration of fade out or flash 
+      int fadingTime = millis() - explosionTime; //time since explosion 
+      int alpha = int(map(fadingTime, 0, fadeTime, 255, 0)); //adjust alpha based on elapsed time
       fill(255, 243, 166, alpha);
       circle(x, y, 30);
     }
