@@ -6,6 +6,7 @@ float trailSpacing;
 float trailX;
 float trailY;
 float ground = 600;
+boolean start = false;
 
 
 
@@ -77,31 +78,46 @@ void setup() {
 }
 
 void draw() {
-  background(0);
-  stroke(255, 0, 0);
-  strokeWeight(1);
-  line(0, ground, width, ground);
-  //using time to add new bombs added every 3 seconds up until there have been 10 bombs
-  ntime = millis(); 
-  
-  if (ntime - bombtime > 3000) {
-    for (int i = 0; i < bombs.length; i++) {
-      if (bombs[i] == null) {
-        bombs[i] = new bomb();
-        break;
+  if (start) {
+    background(0);
+    stroke(255, 0, 0);
+    strokeWeight(1);
+    line(0, ground, width, ground);
+    //using time to add new bombs added every 3 seconds up until there have been 10 bombs
+    ntime = millis(); 
+    if (ntime - bombtime > 3000) {
+      for (int i = 0; i < bombs.length; i++) {
+        if (bombs[i] == null) {
+          bombs[i] = new bomb();
+          break;
+        }
       }
+      bombtime = ntime;
     }
-    bombtime = ntime;
-  }
-  else if (bombtime == 0) {
-    bombs[0] = new bomb();
-    bombtime = ntime;
-  }
-  
-  for (int i = 0; i < bombs.length; i++) {
-    if (bombs[i] != null) {
-      bombs[i].advance();
-      bombs[i].render();
+    else if (bombtime == 0) {
+      bombs[0] = new bomb();
+      bombtime = ntime;
     }
+    
+    for (int i = 0; i < bombs.length; i++) {
+      if (bombs[i] != null) {
+        bombs[i].advance();
+        bombs[i].render();    
+    }
+  }
+} else {
+  //start screen
+  background(0);
+  textSize(40);
+  textAlign(CENTER, CENTER);
+  fill(255, 0, 0);
+  text("Click to Start", width/2, height/2);
+  text("Missile Command", width/2, 350);
+  }
+}
+
+void mousePressed() {
+  if (!start) {
+    start = true;
   }
 }
