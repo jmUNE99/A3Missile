@@ -7,6 +7,10 @@ float trailX;
 float trailY;
 float ground = 630;
 boolean start = false;
+int DeadBuildings = 0;
+boolean[] destroyedCities = new boolean[6]; // Array to track the destroyed cities
+boolean gameOver = false;
+
 
 //this section is generation of antimissile WIP
 class Antimissile {
@@ -123,14 +127,22 @@ Bomb[] bombs = new Bomb[10];
 void setup() {
     size(800, 800);
     bombtime = millis();
+    for (int i = 0; i < destroyedCities.length; i++) {
+        destroyedCities[i] = false; // Initialize all cities as intact
+  }
 }
-
 void draw() {
-    if (start) {
+    if (start) { 
         background(0);
         stroke(255, 0, 0);
         strokeWeight(1);
         line(0, ground, width, ground);
+        
+        if (gameOver) {
+          gameOver();
+          return;
+        } else {
+
         // draw antimissile shape cover
         float shooterX = width/2;
         float shooterY = 610;
@@ -158,7 +170,9 @@ void draw() {
         for (int j = 0; j < 6; j++) {
             float cityX = width / 7 * (j + 1);
             float cityY = ground - 5; // position the cities exactly on the red line
+            if (!destroyedCities[j]) {
             rect(cityX - 15, cityY - 30, 30, 30); // adjust the city dimensions
+         }
         }
 
         for (int i = 0; i < bombs.length; i++) {
@@ -173,7 +187,7 @@ void draw() {
                     if (bombs[i].y >= cityY && bombs[i].x >= cityX - 15 && bombs[i].x <= cityX + 15) {
                         destroyCity(j);
                         bombs[i].exploded = true; 
-                        break;
+                        break;  
                     }
                 }
             }
@@ -184,6 +198,7 @@ void draw() {
             antimissile.move();
             antimissile.render();
         }
+       }
     } else {
         // start screen
         background(0);
@@ -197,20 +212,45 @@ void draw() {
 
 
 void destroyCity(int cityIndex) {
-    // calculate the size and position of the destroyed city based on the intact city
-    float cityX = width / 7 * (cityIndex + 1);
-    float cityY = ground - 30; 
+    if (!destroyedCities[cityIndex]) {
+        destroyedCities[cityIndex] = true; // Mark the city as destroyed
+        DeadBuildings++; //tracks destroyed buildings
 
-    // draw a black square that covers the intact city
-    fill(0);
-    rect(cityX - 15, cityY - 30, 30, 60); // adjust the city dimensions to cover the blue square completely
+        float cityX = width / 7 * (cityIndex + 1);
+        float cityY = ground - 30;
+
+        fill(0);
+        rect(cityX - 15, cityY - 30, 30, 60);
+
+        if (DeadBuildings >= 6) {
+            gameOver = true; //game over screen
+        }
+    }
 }
+// display game over screen
+void gameOver() {
+  // game over
+  background(0);
+  textSize(50);
+  textAlign(CENTER, CENTER);
+  fill(255, 0, 0);
+  text("Game Over", width/2, height/2);
+}
+
 
 // if mouse click, start game and also handles shooting the ABM
 void mousePressed() {
-    if (!start) {
+    if (gameOver) {
+      // Return to start screen when "Game Over" screen is clicked
+      start = false;
+      gameOver = false;
+      for (int i = 0; i < destroyedCities.length; i++) {
+        destroyedCities[i] = false; // reset the destroyed cities array
+      }
+    } else if (!start) {
+        // Start the game
         start = true;
     } else {
-         antimissiles.add(new Antimissile(mouseX, mouseY));
+        antimissiles.add(new Antimissile(mouseX, mouseY));
     }
 }
