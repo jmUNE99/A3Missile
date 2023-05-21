@@ -10,6 +10,7 @@ boolean start = false;
 int DeadBuildings = 0;
 boolean[] destroyedCities = new boolean[6]; // Array to track the destroyed cities
 boolean gameOver = false;
+int score = 0; 
 
 
 //this section is generation of antimissile WIP
@@ -18,6 +19,7 @@ class Antimissile {
     float velax, velay; // velocity 
     boolean exploded;
     int etime;
+   
     // set antimissile velocity and starting point
     Antimissile(float targetX, float targetY) {
         x = width/2;
@@ -25,7 +27,7 @@ class Antimissile {
         float dx = targetX - x;
         float dy = targetY - y;
         float distance = sqrt(dx * dx + dy * dy);
-        float speed = distance / 120;
+        float speed = 4;
         velax = dx / distance * speed;
         velay = dy / distance * speed;
 
@@ -33,12 +35,27 @@ class Antimissile {
         etime = 0;
     }
 
-    void move() {
+      void move() {
         if (!exploded) {
-            x += velax;
-            y += velay;
-        // collision condition goes here
+          x += velax;
+          y += velay;
+          for (Bomb bomb : bombs) {
+            if (bomb != null && !bomb.exploded && collidesWithBomb(bomb)) {
+              score++;
+              explode();
+              bomb.exploded = true;
+              break;
+            }
+          }
         }
+      }
+      //calculate distance between bomb and anti missile
+      boolean collidesWithBomb(Bomb bomb) {
+        float distance = dist(x, y, bomb.x, bomb.y);
+      if (distance <= 10) {
+        return true; //collision
+      }
+      return false; // no collision
     }
 
     void render() {
@@ -46,7 +63,7 @@ class Antimissile {
             fill(255);
             ellipse(x, y, 10, 10);
         } else {
-            //explosion of antimissile, currently not in use
+            //explosion of antimissile
             noStroke();
             int fadeTime = 500;
             int fadingTime = millis() - etime;
@@ -138,6 +155,12 @@ void draw() {
         strokeWeight(1);
         line(0, ground, width, ground);
         
+          // Draw score in the top-right corner
+        fill(255);
+        textSize(24);
+        textAlign(RIGHT, TOP);
+        text("Score: " + score, width - 10, 10);
+        
         if (gameOver) {
           gameOver();
           return;
@@ -149,6 +172,7 @@ void draw() {
         fill(128, 128, 0);
         stroke(128, 128, 0);
         triangle(shooterX - 20, shooterY + 20, shooterX, shooterY - 20, shooterX + 20, shooterY + 20);
+        
         // bombs added every 3 sec
         CurrentMillis = millis();
         if (CurrentMillis - bombtime > 3000) {
@@ -197,8 +221,16 @@ void draw() {
         for (Antimissile antimissile : antimissiles) {
             antimissile.move();
             antimissile.render();
+
+        // check if antimissile hits a bomb
+          for (int i = 0; i < bombs.length; i++) {
+            if (bombs[i] != null && antimissile.collidesWithBomb(bombs[i])) {
+              antimissile.explode();
+              bombs[i].exploded = true;
+            }
+          }
         }
-       }
+      }
     } else {
         // start screen
         background(0);
